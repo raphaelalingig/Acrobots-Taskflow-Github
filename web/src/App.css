@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+}
+.container {
+}
+.navigation {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+}
+.navigations-links {
+  display: flex;
+}
+.landingpage-img {
+  height: 50%;
+}
+
+.logo {
+  width: 10rem;
+}
+
+.container-motto {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.motto-text {
+}
