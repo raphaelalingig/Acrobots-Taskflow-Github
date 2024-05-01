@@ -4,5 +4,9 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [require("flowbite/plugin"),require('flowbite-typography')],
+  plugins: [
+    require("flowbite/plugin"),
+    require("flowbite-typography"),
+    require("@themesberg/flowbite/plugin"),
+  ],
 };
