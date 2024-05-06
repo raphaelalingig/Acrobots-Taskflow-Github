@@ -49,6 +49,10 @@ class Group(models.Model):
         default_group, _ = cls.objects.get_or_create(name="Default Group")
         return default_group.id
     
+    def __str__(self):
+        project_names = ', '.join(project.project_name for project in self.projects.all())
+        return f"{self.name} - Projects: {project_names}"
+    
 
 
 
@@ -65,18 +69,11 @@ class Project(models.Model):
 
     def owner_username(self):
         return self.owner.username
-    
+        
 class GroupNprojectAssoc(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
+    project = models.ManyToManyField(Project, blank=True)
     members = models.ManyToManyField(User)
-
-   
-    def project_username(self):
-        return self.project.project_name
-    
-
-    
 
 
 class Task(models.Model):

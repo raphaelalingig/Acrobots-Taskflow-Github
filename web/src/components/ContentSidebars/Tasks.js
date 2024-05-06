@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useState, useEffect } from "react";
 import StatusDropdown from "../MiniComponents.js/StatusDropdown";
 import PriorityDropdown from "../MiniComponents.js/PriorityDropdown";
+import axios from "axios";
 
 const Tasks = () => {
   const [selected1stDate, setSelected1stDate] = useState(null);
@@ -32,6 +33,24 @@ const Tasks = () => {
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
+  const deleteTask = (taskId) => {
+    axios
+      .delete(`http://127.0.0.1:8080/api/tasks/${taskId}/`)
+      .then((response) => {
+        // Handle success, e.g., update UI
+        console.log( "Task deleted successfully");
+      })
+      .catch((error) => {
+        // Handle error, e.g., show error message
+        console.error("Error deleting task:", error);
+      });
+  };
+  const handleDelete = (taskId) => {
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      deleteTask(taskId);
+    }
+  };
+
 
   return (
     <>
@@ -102,6 +121,9 @@ const Tasks = () => {
                   <th scope="col" class="px-6 py-3">
                     Priority
                   </th>
+                  <th scope="col" class="px-6 py-3">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -139,6 +161,22 @@ const Tasks = () => {
                     <td class="px-6 py-4">3Days For Sample</td>
                     <td class="px-6 py-4">
                       <PriorityDropdown />
+                    </td>
+                    
+                    <td className="px-6 py-4">
+                      <button
+                        type="button"
+                        class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                      >
+                        EDIT
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDelete}
+                        class="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                      >
+                        DELETE
+                      </button>
                     </td>
                   </tr>
                 ))}

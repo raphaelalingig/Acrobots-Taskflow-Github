@@ -6,7 +6,6 @@ from django.db.models.signals import post_save
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
 from api.serializers import MyTokenObtainPairSerializer, RegisterSerializer, TaskSerializers, UserSerializer, GroupSerializer, GroupProject_Assoc_Serializers
 
@@ -25,6 +24,7 @@ from django.shortcuts import redirect
 from rest_framework import viewsets
 from .serializers import ProjectSerializers
 from .models import Project, Task, Group, GroupNprojectAssoc
+from rest_framework.permissions import IsAuthenticated
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -47,16 +47,7 @@ def confirm_email(request):
         return Response({'message': 'Invalid token'}, status=400)
 
 # Get All Routes
-@api_view(['GET'])
-def getRoutes(request):
-    routes = [
-        '/api/token/',
-        '/api/register/',
-        '/api/token/refresh/',
-        '/api/projects/'
-        
-    ]
-    return Response(routes)
+
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -99,9 +90,11 @@ class ProjectView(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializers
 
+
 class TaskView(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializers
+    
 
 class UserView(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -114,4 +107,13 @@ class GroupView(viewsets.ModelViewSet):
 class GroupProject_Assoc_View(viewsets.ModelViewSet):
     queryset = GroupNprojectAssoc.objects.all()
     serializer_class = GroupProject_Assoc_Serializers
+
+class TaskDetailView(generics.DestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializers
+
+    def delete(self, request, *args, **kwargs):
+        task = self.get_object()
+        task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 

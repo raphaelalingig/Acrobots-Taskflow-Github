@@ -22,7 +22,7 @@ class GroupAdmin(admin.ModelAdmin):
     list_display = ['name']
 
 class GroupNprojectAssocAdmin(admin.ModelAdmin):
-    list_display = ['group', 'project']
+    list_display = ['group']
 
 admin.site.register(User, UserAdmin)
 admin.site.register( Profile,ProfileAdmin)
