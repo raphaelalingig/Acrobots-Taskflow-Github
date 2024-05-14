@@ -57,13 +57,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 class ProjectSerializers(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id','project_name', 'start_date', 'due_date', 'owner','owner_username', 'description')
+        fields = ('id','project_name', 'start_date', 'due_date', 'description')
 
 
 class TaskSerializers(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ('id', 'task_name','project_name','project_username', 'start_date', 'due_date', 'assignee', 'description', 'group')
+        fields = ('id', 'task_name','project_name', 'start_date', 'due_date', 'assignee', 'description')
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:

@@ -31,8 +31,8 @@ const Login = () => {
               <img src={picture} alt="login-picture"></img>
             </div>
             <div className="login-form-container flex justify-center items-center sm:w-1/2">
-              <div className="flex flex-col ">
-                <div className="login-form text-center flex-col mr-32">
+              <div className="flex flex-col">
+                <div className="login-form text-center flex-col">
                   <h1 className="text-3xl sm:text-4xl mb-2">Welcome</h1>
                   <h3 className="text-lg sm:text-xl mb-4">
                     Login to your account
@@ -61,7 +61,7 @@ const Login = () => {
                     <input
                       type="text"
                       id="input-group-1"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/2 ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="name@gmail.com"
                       required
                       name="email"
@@ -96,7 +96,7 @@ const Login = () => {
                     <input
                       type="password"
                       id="website-admin"
-                      class="rounded-none rounded-e-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block  min-w-0 w-5/12 text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      class="rounded-none rounded-e-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       required
                       name="password"
                     />

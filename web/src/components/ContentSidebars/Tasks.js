@@ -12,6 +12,7 @@ const Tasks = () => {
   const [selected2ndDate, setSelected2ndDate] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [taskdata, setProjectdata] = useState([]);
+  const swal = require("sweetalert2");
 
   useEffect(() => {
     fetchtasks();
@@ -33,24 +34,24 @@ const Tasks = () => {
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-  const deleteTask = (taskId) => {
-    axios
-      .delete(`http://127.0.0.1:8080/api/tasks/${taskId}/`)
-      .then((response) => {
-        // Handle success, e.g., update UI
-        console.log( "Task deleted successfully");
-      })
-      .catch((error) => {
-        // Handle error, e.g., show error message
-        console.error("Error deleting task:", error);
+  const deleteTask = async (taskId) => {
+    try {
+      await axios.delete(`http://127.0.0.1:8080/api/task/${taskId}/`);
+      // Remove the deleted group from the state
+      setProjectdata(taskdata.filter((task) => task.id !== taskId));
+      swal.fire({
+        title: "Task deleted successfully",
+        icon: "success",
+        toast: true,
+        timer: 3000,
+        position: "top-right",
+        timerProgressBar: true,
+        showConfirmButton: false,
       });
-  };
-  const handleDelete = (taskId) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      deleteTask(taskId);
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
-
 
   return (
     <>
@@ -106,9 +107,9 @@ const Tasks = () => {
                   <th scope="col" class="px-6 py-3">
                     Task Name
                   </th>
-                  <th scope="col" class="px-6 py-3">
+                  {/* <th scope="col" class="px-6 py-3">
                     Project Name
-                  </th>
+                  </th> */}
                   <th scope="col" class="px-6 py-3">
                     Status
                   </th>
@@ -151,7 +152,7 @@ const Tasks = () => {
                     >
                       {task.task_name}
                     </th>
-                    <td class="px-6 py-4">{task.project_username}</td>
+                    {/* <td class="px-6 py-4">{task.project_username}</td> */}
                     <td class="px-6 py-4">
                       <StatusDropdown />
                     </td>
@@ -162,7 +163,6 @@ const Tasks = () => {
                     <td class="px-6 py-4">
                       <PriorityDropdown />
                     </td>
-                    
                     <td className="px-6 py-4">
                       <button
                         type="button"
@@ -172,8 +172,8 @@ const Tasks = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={handleDelete}
                         class="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                        onClick={() => deleteTask(task.id)}
                       >
                         DELETE
                       </button>

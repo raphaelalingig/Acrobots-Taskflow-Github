@@ -9,7 +9,6 @@ import Dashboard from "../src/components/ContentSidebars/Dashboard"
 import Projects from "../src/components/ContentSidebars/Projects"
 import Calendar from "../src/components/ContentSidebars/Calendar";
 import Groups from "../src/components/ContentSidebars/Groups";
-import Reports from "../src/components/ContentSidebars/Reports";
 import Tasks from "../src/components/ContentSidebars/Tasks";
 import ProjectContents from "../src/components/ContentSidebars/InsideProject/ProjectContents";
 import InsideTask from "./components/ContentSidebars/InsideComponents/InsideTask";
@@ -26,7 +25,6 @@ function App() {
           <PrivateRoute exact component={Projects} path="/projects" />
           <PrivateRoute exact component={Calendar} path="/calendar" />
           <PrivateRoute exact component={Groups} path="/groups" />
-          <PrivateRoute exact component={Reports} path="/reports" />
           <PrivateRoute exact component={Tasks} path="/tasks" />
           <PrivateRoute component={ProjectContents} path="/nameoftheproject" />
           <PrivateRoute component={InsideTask} path="/task/view_task" />

@@ -7,6 +7,8 @@ import StatusDropdown from "../MiniComponents.js/StatusDropdown";
 import DueDateDropdown from "../MiniComponents.js/DueDateDropdown";
 import PriorityDropdown from "../MiniComponents.js/PriorityDropdown";
 import AddProject from "../MiniComponents.js/Modals/AddProject";
+import axios from "axios";
+const swal = require("sweetalert2");
 
 const Projects = () => {
   const [addProjectModal, setAddprojectModal] = useState(false);
@@ -44,6 +46,24 @@ const Projects = () => {
       }
       const data = await response.json();
       setUserData(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  const deleteProject = async (projectId) => {
+    try {
+      await axios.delete(`http://127.0.0.1:8080/api/projects/${projectId}/`);
+      // Remove the deleted group from the state
+      setProjectdata(projectdata.filter((project) => project.id !== projectId));
+      swal.fire({
+        title: "Project deleted successfully",
+        icon: "success",
+        toast: true,
+        timer: 3000,
+        position: "top-right",
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
     } catch (error) {
       console.error("Error:", error);
     }
@@ -135,22 +155,7 @@ const Projects = () => {
                       </a>
                     </div>
                   </th>
-                  <th scope="col" class="px-6 py-3">
-                    <div className="flex items-center">
-                      Owner
-                      <a href="#">
-                        <svg
-                          className="w-3 h-3 ms-1.5"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
-                        </svg>
-                      </a>
-                    </div>
-                  </th>
+
                   <th scope="col" className="px-6 py-3">
                     Priority
                   </th>
@@ -180,8 +185,6 @@ const Projects = () => {
                       {project.start_date} - {project.due_date}
                     </td>
 
-                    <td className="px-6 py-4">{project.owner_username}</td>
-
                     <td className="px-6 py-4">
                       <PriorityDropdown />
                     </td>
@@ -195,6 +198,7 @@ const Projects = () => {
                       <button
                         type="button"
                         class="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                        onClick={() => deleteProject(project.id)}
                       >
                         DELETE
                       </button>

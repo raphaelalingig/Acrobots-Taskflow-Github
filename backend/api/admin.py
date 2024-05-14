@@ -11,8 +11,7 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'full_name' ,'verified']
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_editable = ['owner']
-    list_display = ['project_name','start_date', 'due_date', 'owner']
+    list_display = ['project_name','start_date', 'due_date']
 
 class TaskAdmin(admin.ModelAdmin):
     list_editable = ['assignee']

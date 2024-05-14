@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import DueDateDropdown from "../DueDateDropdown";
 import PriorityDropdown from "../PriorityDropdown";
 import axios from "axios";
+const swal = require("sweetalert2");
 
 const AddProject = ({ closemodal, addNewProject }) => {
   const [projectName, setProjectName] = useState("");
@@ -50,7 +51,6 @@ const AddProject = ({ closemodal, addNewProject }) => {
         project_name: projectName,
         start_date: selectedStartDate,
         due_date: selectedEndDate,
-        owner: owner,
         description: description,
       });
       console.log("Project added successfully:", response.data);
@@ -78,6 +78,15 @@ const AddProject = ({ closemodal, addNewProject }) => {
     console.log(newProject);
     addNewProject(newProject);
     postdata();
+    swal.fire({
+      title: "Project added successfully, Please reload the page",
+      icon: "success",
+      toast: true,
+      timer: 3000,
+      position: "top-right",
+      timerProgressBar: true,
+      showConfirmButton: false,
+    });
     // Clear form fields
     setProjectName("");
     setOwner("");
@@ -148,50 +157,7 @@ const AddProject = ({ closemodal, addNewProject }) => {
                   setSelectedEndDate={setSelectedEndDate}
                 />
               </div>
-              <div>
-                <label className="block  w-full mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Owner
-                </label>
 
-                <select
-                  type="text"
-                  name="Owner"
-                  id="Owner"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required=""
-                  onChange={(e) => {
-                    setGroup(e.target.value);
-                  }}
-                >
-                  {userdata.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.username}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block  w-full mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Group 1
-                </label>
-
-                <select
-                  type="text"
-                  name="group"
-                  id="group"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required=""
-                  onChange={(e) => {
-                    setOwner(e.target.value);
-                  }}
-                >
-                  {groupdata.map((group) => (
-                    <option key={group.id} value={group.id}>
-                      {group.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
               <div className="sm:col-span-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Description

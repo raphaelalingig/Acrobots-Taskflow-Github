@@ -12,6 +12,7 @@ const AddTask = ({ closemodal, addNewTask }) => {
   const [projectName, setProjectName] = useState([]);
   const [projectData, setProjectData] = useState([]);
   const [userdata, setUserData] = useState([]);
+  const swal = require("sweetalert2");
 
   useEffect(() => {
     fetchProjectdata();
@@ -47,7 +48,7 @@ const AddTask = ({ closemodal, addNewTask }) => {
     try {
       const response = await axios.post("http://127.0.0.1:8080/api/task/", {
         task_name: taskName,
-        project_name: projectName,
+        // project_name: projectName,
         assignee: asignee,
         description: description,
         start_date: selectedStartDate,
@@ -55,7 +56,7 @@ const AddTask = ({ closemodal, addNewTask }) => {
       });
       console.log("Task added successfully", response.data);
     } catch (error) {
-      console.log("Error:", error)
+      console.log("Error:", error);
     }
   };
 
@@ -78,6 +79,15 @@ const AddTask = ({ closemodal, addNewTask }) => {
     console.log(newTask);
     addNewTask(newTask);
     postdata();
+    swal.fire({
+      title: "Task added successfully, Please reload the page",
+      icon: "success",
+      toast: true,
+      timer: 3000,
+      position: "top-right",
+      timerProgressBar: true,
+      showConfirmButton: false,
+    });
 
     setTaskName("");
     setAsignee("");
@@ -138,7 +148,7 @@ const AddTask = ({ closemodal, addNewTask }) => {
                 />
               </div>
               <div>
-                <label className="block  w-full mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                {/* <label className="block  w-full mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Project Name
                 </label>
 
@@ -157,7 +167,7 @@ const AddTask = ({ closemodal, addNewTask }) => {
                       {project.project_name}
                     </option>
                   ))}
-                </select>
+                </select> */}
               </div>
 
               <div>

@@ -1,35 +1,86 @@
-import React, { useState } from "react";
 import DueDateDropdown from "../DueDateDropdown";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Label } from "flowbite-react";
 
-const AddGroup = ({ closemodal, addNewTask }) => {
-  const [taskName, setTaskName] = useState("");
-  const [asignee, setAsignee] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedStartDate, setSelectedStartDate] = useState("");
-  const [selectedEndDate, setSelectedEndDate] = useState("");
+const AddGroup = ({ closemodal }) => {
+  const [groupName, setGroupName] = useState("");
+  const [members, setMembers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [projectData, setProjectData] = useState([]);
+  const [projectName, setProjectName] = useState([]);
+  const [addNewGroup, setaddNewGroup] = useState();
+  const swal = require("sweetalert2");
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    fetchAllUsers();
+    fetchProjectdata();
+  }, []);
+
+  const fetchProjectdata = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8080/api/projects/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch task data");
+      }
+      const data = await response.json();
+      setProjectData(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const fetchAllUsers = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8080/api/user/");
+      setAllUsers(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  const handleMemberSelect = (e) => {
+    const selectedUserIds = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
+    setMembers(selectedUserIds);
+  };
+  const handleProjectSelect = (e) => {
+    const selectedProjectIds = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
+    setProjectName(selectedProjectIds);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(taskName);
-    console.log(asignee);
-    console.log(description);
-    console.log("Selected Start Date: ", selectedStartDate);
-    console.log("Selected End Date:", selectedEndDate);
-    const newTask = {
-      taskName,
-      asignee,
-      description,
-      selectedStartDate,
-      selectedEndDate,
-    };
-    console.log(newTask);
-    addNewTask(newTask);
+    console.log("Group Name:", groupName);
+    console.log("Members:", members);
+    console.log("Project Name:", projectName);
 
-    setTaskName("");
-    setAsignee("");
-    setDescription("");
-    setSelectedStartDate("");
-    setSelectedEndDate("");
+    try {
+      const response = await axios.post("http://127.0.0.1:8080/api/group/", {
+        name: groupName,
+        members: members,
+        projects: projectName,
+      });
+      setGroupName("");
+      setMembers([]);
+      swal.fire({
+        title: "Group added successfully, Please reload the page",
+        icon: "success",
+        toast: true,
+        timer: 3000,
+        position: "top-right",
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+      closemodal(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
@@ -79,30 +130,25 @@ const AddGroup = ({ closemodal, addNewTask }) => {
                   placeholder="Type task name"
                   required
                   onChange={(e) => {
-                    setTaskName(e.target.value);
+                    setGroupName(e.target.value);
                   }}
                 />
               </div>
 
               <div>
-                <label
-                  for="category"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Members
                 </label>
-
                 <select
-                  type="text"
-                  name="asignee"
-                  id="asignee"
+                  multiple
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="Appointed person"
-                  required
+                  onChange={handleMemberSelect}
                 >
-                  <option>Member 1</option>
-                  <option>Member 2</option>
-                  <option>Member 3</option>
+                  {allUsers.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.username}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -114,16 +160,15 @@ const AddGroup = ({ closemodal, addNewTask }) => {
                 </label>
 
                 <select
-                  type="text"
-                  name="asignee"
-                  id="asignee"
+                  multiple
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="Appointed person"
-                  required
+                  onChange={handleProjectSelect}
                 >
-                  <option>Projects 1</option>
-                  <option>Projects 2</option>
-                  <option>Projects 3</option>
+                  {projectData.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.project_name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

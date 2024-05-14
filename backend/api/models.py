@@ -40,7 +40,7 @@ post_save.connect(save_user_profile, sender=User)
 class Group(models.Model):
     name = models.CharField(max_length=100)
     members = models.ManyToManyField(User)
-    projects = models.ManyToManyField('Project', related_name='groups')
+    projects = models.ManyToManyField('Project', related_name='groups', null=True, blank=True)
     def __str__(self):
         return self.name
 
@@ -49,10 +49,6 @@ class Group(models.Model):
         default_group, _ = cls.objects.get_or_create(name="Default Group")
         return default_group.id
     
-    def __str__(self):
-        project_names = ', '.join(project.project_name for project in self.projects.all())
-        return f"{self.name} - Projects: {project_names}"
-    
 
 
 
@@ -60,32 +56,30 @@ class Project(models.Model):
     project_name = models.CharField(max_length=100)
     start_date = models.DateField()
     due_date = models.DateField()
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, default=Group.get_default_group_id)
 
     def __str__(self):
         return self.project_name
 
-    def owner_username(self):
-        return self.owner.username
-        
+    
+
+    
 class GroupNprojectAssoc(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
-    project = models.ManyToManyField(Project, blank=True)
+    project = models.ManyToManyField(Project)
     members = models.ManyToManyField(User)
+
+
 
 
 class Task(models.Model):
     task_name = models.CharField(max_length=100, default=None)
-    project_name = models.ForeignKey(Project, on_delete=models.CASCADE, default=None)
+    project_name = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
     start_date = models.DateField()
     due_date = models.DateField()
-    assignee = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    assignee = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField()
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, default=Group.get_default_group_id)  
+
     def __str__(self):
         return self.task_name
-    
-    def project_username(self):
-        return self.project_name.project_name
+

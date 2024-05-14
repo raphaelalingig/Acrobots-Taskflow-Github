@@ -1,32 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Aside from "../../Sidebars.js/Aside";
 import { Link } from "react-router-dom";
 import StatusDropdown from "../../MiniComponents.js/StatusDropdown";
 import DueDateDropdown from "../../MiniComponents.js/DueDateDropdown";
 import PriorityDropdown from "../../MiniComponents.js/PriorityDropdown";
 import AddTask from "../../MiniComponents.js/Modals/AddTask";
-import axios from "axios";
 
 const ProjectContents = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState("");
   const [selectedEndDate, setSelectedEndDate] = useState("");
-  const [tasks, setTasks] = useState([]);
-
-  useEffect(() => {
-    fetchTasksForProject();
-  }, []);
-
-  const fetchTasksForProject = async (projectId) => {
-    try {
-      const response = await axios.get(
-        `http://127.0.0.1:8080/api/task/?project_id=${projectId}`
-      );
-      setTasks(response.data);
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-    }
-  };
+  const [tasks, setTasks] = useState([])
 
   const addNewTask = (newTask) => {
     setTasks([...tasks, newTask]);
@@ -179,9 +163,6 @@ const ProjectContents = () => {
                   <th scope="col" class="px-6 py-3">
                     Priority
                   </th>
-                  <th scope="col" class="px-6 py-3">
-                    Actions
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -207,20 +188,6 @@ const ProjectContents = () => {
                     <td className="px-6 py-4">{task.asignee}</td>
                     <td className="px-6 py-4">
                       <PriorityDropdown />
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        type="button"
-                        class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                      >
-                        EDIT
-                      </button>
-                      <button
-                        type="button"
-                        class="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                      >
-                        DELETE
-                      </button>
                     </td>
                   </tr>
                 ))}
