@@ -1,67 +1,80 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
-import { Table, TableWrapper, Row, Cell } from "react-native-table-component";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+} from "react-native";
+import { Text } from "react-native-paper";
 
-export default class Dashboard extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      tableHead: ["Project Name", "Status", "Due date", "Actions"],
-      tableData: [
-        ["1", "2", "3", "4"],
-        ["a", "b", "c", "d"],
-        ["1", "2", "3", "4"],
-        ["a", "b", "c", "d"],
-      ],
-    };
-  }
-
-  _alertIndex(index) {
-    Alert.alert(`This is row ${index + 1}`);
-  }
-
-  render() {
-    const state = this.state;
-    const element = (data, index) => (
-      <TouchableOpacity onPress={() => this._alertIndex(index)}>
-        <View style={styles.btn}>
-          <Text style={styles.btnText}>button</Text>
+const Dashboard = () => {
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.taskContent}>
+        <View style={styles.taskStatus}>
+          <View style={styles.opentask}>
+            <Text>Open Tasks</Text>
+            <Text>10</Text>
+          </View>
+          <View style={styles.closetask}>
+            <Text>Close Tasks</Text>
+            <Text>10</Text>
+          </View>
         </View>
-      </TouchableOpacity>
-    );
-
-    return (
-      <View style={styles.container}>
-        <ScrollView>
-          <Table borderStyle={{ borderColor: "transparent" }}>
-            <Row
-              data={state.tableHead}
-              style={styles.head}
-              textStyle={styles.text}
-            />
-            {state.tableData.map((rowData, index) => (
-              <TableWrapper key={index} style={styles.row}>
-                {rowData.map((cellData, cellIndex) => (
-                  <Cell
-                    key={cellIndex}
-                    data={cellIndex === 3 ? element(cellData, index) : cellData}
-                    textStyle={styles.text}
-                  />
-                ))}
-              </TableWrapper>
-            ))}
-          </Table>
-        </ScrollView>
       </View>
-    );
-  }
-}
+      <View style={styles.projectContent}>
+        <Text style={styles.projectTitle}>Available Projects: </Text>
+        <Text style={styles.projectNames}>sample projects</Text>
+        <Text style={styles.projectNames}>sample projects</Text>
+      </View>
+      <View style={styles.tasksContent}>
+        <Text style={styles.projectTitle}>Available Projects: </Text>
+        <Text style={styles.projectNames}>sample projects</Text>
+        <Text style={styles.projectNames}>sample projects</Text>
+      </View>
+      
+    </ScrollView>
+  );
+};
+
+export default Dashboard;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: "#fff" },
-  head: { height: 50, backgroundColor: "#808B97" },
-  text: { margin: 6 },
-  row: { flexDirection: "row", backgroundColor: "#FFF1C1" },
-  btn: { width: 58, height: 18, backgroundColor: "#78B7BB", borderRadius: 2 },
-  btnText: { textAlign: "center", color: "#fff" },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#D9D9D9",
+  },
+  taskContent: {
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+  },
+  taskStatus: {
+    flexDirection: "row",
+    gap: 90,
+  },
+  projectContent: {
+    marginTop: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 80,
+    backgroundColor: "white",
+    borderRadius: 20,
+  },
+  projectTitle: {
+    right: "30%",
+  },
+  projectNames: {
+    left: "20%",
+    marginBottom: 5,
+  },
+  tasksContent: {
+    marginTop: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 80,
+    backgroundColor: "white",
+    borderRadius: 20,
+  },
 });
