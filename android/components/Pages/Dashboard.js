@@ -33,7 +33,6 @@ const Dashboard = () => {
         <Text style={styles.projectNames}>sample projects</Text>
         <Text style={styles.projectNames}>sample projects</Text>
       </View>
-      
     </ScrollView>
   );
 };

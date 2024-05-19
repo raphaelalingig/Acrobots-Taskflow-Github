@@ -1,75 +1,58 @@
-import { createContext, useState, useEffect, useContext } from "react";
-import { jwtDecode } from "jwt-decode";
-import { useHistory } from "react-router-dom";
-const swal = require("sweetalert2");
+import React, { createContext, useState, useEffect, useContext } from "react";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import jwtDecode from "jwt-decode";
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+  Toast,
+} from "react-native-alert-notification";
 
 const AuthContext = createContext();
 
-export default AuthContext;
-
 export const AuthProvider = ({ children }) => {
-  const [authTokens, setAuthTokens] = useState(() =>
-    localStorage.getItem("authTokens")
-      ? JSON.parse(localStorage.getItem("authTokens"))
-      : null
-  );
-
-  const [user, setUser] = useState(() =>
-    localStorage.getItem("authTokens")
-      ? jwtDecode(localStorage.getItem("authTokens"))
-      : null
-  );
-
+  const [authTokens, setAuthTokens] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const history = useHistory();
+  useEffect(() => {
+    const loadTokens = async () => {
+      const tokens = await AsyncStorage.getItem("authTokens");
+      if (tokens) {
+        setAuthTokens(JSON.parse(tokens));
+        setUser(jwtDecode(JSON.parse(tokens).access));
+      }
+      setLoading(false);
+    };
+    loadTokens();
+  }, []);
 
   const loginUser = async (email, password) => {
-    const response = await fetch("http://127.0.0.1:8080/api/token/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    try {
+      const response = await axios.post("http://192.168.1.15:8080/api/token/", {
         email,
         password,
-      }),
-    });
-    const data = await response.json();
-    console.log(data);
-
-    if (response.status === 200) {
-      console.log("Logged In");
+      });
+      const data = response.data;
       setAuthTokens(data);
       setUser(jwtDecode(data.access));
-      localStorage.setItem("authTokens", JSON.stringify(data));
-      history.push("/");
-      swal.fire({
-        title: "Login Successful",
-        icon: "success",
-        toast: true,
-        timer: 6000,
-        position: "top-right",
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-    } else {
-      console.log(response.status);
-      console.log("there was a server issue");
-      swal.fire({
-        title: "Username or passowrd does not exists",
-        icon: "error",
-        toast: true,
-        timer: 6000,
-        position: "top-right",
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-    }
+      await AsyncStorage.setItem("authTokens", JSON.stringify(data));
+    } catch (error) {}
   };
 
+  const logoutUser = async () => {
+    setAuthTokens(null);
+    setUser(null);
+    await AsyncStorage.removeItem("authTokens");
+    Toast.show({
+      type: ALERT_TYPE.SUCCESS,
+      title: "Success",
+      textBody: "You've successfully logged out your account",
+    });
+  };
   const registerUser = async (email, username, password, password2) => {
-    const response = await fetch("http://127.0.0.1:8080/api/register/", {
+    const response = await fetch("http://192.168.1.15:8080/api/register/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -81,48 +64,7 @@ export const AuthProvider = ({ children }) => {
         password2,
       }),
     });
-    if (response.status === 201) {
-      history.push("/login");
-      swal.fire({
-        title: "Registration Successful, Login Now",
-        icon: "success",
-        toast: true,
-        timer: 6000,
-        position: "top-right",
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-    } else {
-      console.log(response.status);
-      console.log("there was a server issue");
-      swal.fire({
-        title: "An Error Occured " + response.status,
-        icon: "error",
-        toast: true,
-        timer: 6000,
-        position: "top-right",
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-    }
   };
-
-  const logoutUser = () => {
-    setAuthTokens(null);
-    setUser(null);
-    localStorage.removeItem("authTokens");
-    history.push("/login");
-    swal.fire({
-      title: "You have been logged out...",
-      icon: "success",
-      toast: true,
-      timer: 6000,
-      position: "top-right",
-      timerProgressBar: true,
-      showConfirmButton: false,
-    });
-  };
-
   const contextData = {
     user,
     setUser,
@@ -133,16 +75,11 @@ export const AuthProvider = ({ children }) => {
     logoutUser,
   };
 
-  useEffect(() => {
-    if (authTokens) {
-      setUser(jwtDecode(authTokens.access));
-    }
-    setLoading(false);
-  }, [authTokens, loading]);
-
   return (
     <AuthContext.Provider value={contextData}>
       {loading ? null : children}
     </AuthContext.Provider>
   );
 };
+export const useAuth = () => useContext(AuthContext);
+export default AuthContext;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -8,38 +8,57 @@ import {
   Platform,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { Table, TableWrapper, Row, Cell } from "react-native-table-component";
-import { Portal, Modal, TextInput, Text, Button } from "react-native-paper";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import {
+  Portal,
+  Modal,
+  TextInput,
+  Text,
+  Button,
+  DataTable,
+} from "react-native-paper";
 import axios from "axios";
-import { Dropdown } from "react-native-element-dropdown";
+import DueDateDropdown from "./DueDateDropdown/DueDate";
+import { Picker } from "@react-native-picker/picker";
 
-const formatDate = (date) => {
-  if (!date) return "";
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-const Projects = () => {
-  const [tableHead] = useState(["Task Name", "Status", "Due date", "Actions"]);
-  const [tableData, setTableData] = useState([
-    ["Project A", "In Progress", "2024/05/20", "4"],
-    ["Project B", "Completed", "2024/05/15", "d"],
-    ["Project C", "Not Started", "2024/05/25", "4"],
-    ["Project D", "Delayed", "2024/05/30", "d"],
-  ]);
+const Tasks = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [date, setDate] = useState(null);
-  const [secondDate, setSecondDate] = useState(null);
-
-  const [showFirstDatePicker, setShowFirstDatePicker] = useState(false);
-  const [showSecondDatePicker, setShowSecondDatePicker] = useState(false);
-
-  const [taskName, settaskName] = useState("");
+  const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
+  const [selectedStartDate, setSelectedStartDate] = useState("");
+  const [selectedEndDate, setSelectedEndDate] = useState("");
   const [assignee, setAssignee] = useState("");
+  const [userData, setUserData] = useState([]);
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch("http://192.168.1.15:8080/api/user/");
+      if (!response.ok) {
+        console.log("Failed to fetch Users");
+        throw new Error("Failed to fetch Users");
+      }
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  };
+  const postdata = async () => {
+    try {
+      const response = await axios.post("http://192.168.1.15:8080/api/task/", {
+        task_name: taskName,
+        assignee: assignee,
+        description: description,
+        start_date: selectedStartDate,
+        due_date: selectedEndDate,
+      });
+      console.log("Task added successfully", response.data);
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  };
 
   const showModal = () => {
     setModalVisible(true);
@@ -48,71 +67,20 @@ const Projects = () => {
   const hideModal = () => {
     setModalVisible(false);
   };
-  const postdata = async () => {
-    try {
-      const response = await axios.post("http://127.0.0.1:8080/api/task/", {
-        task_name: taskName,
-        start_date: date,
-        due_date: secondDate,
-        description: description,
-      });
-      console.log("Project added successfully:", response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
 
   const handleSubmit = () => {
     console.log("Task Name:", taskName);
-    console.log("Start Date:", formatDate(date));
-    console.log("End Date:", formatDate(secondDate));
     console.log("Description:", description);
-    console.log("Assignee:", assignee);
-
+    console.log("Start Date:", selectedStartDate);
+    console.log("End Date:", selectedEndDate);
+    console.log("Assignee: ", assignee);
     postdata();
-    hideModal(true);
-    setProjectName("");
+    hideModal();
+    setTaskName("");
+    setAssignee("");
     setDescription("");
-    setDate(null);
-    setSecondDate(null);
-  };
-  const data = [
-    { label: "Item 1", value: "1" },
-    { label: "Item 2", value: "2" },
-    { label: "Item 3", value: "3" },
-    { label: "Item 4", value: "4" },
-    { label: "Item 5", value: "5" },
-    { label: "Item 6", value: "6" },
-    { label: "Item 7", value: "7" },
-    { label: "Item 8", value: "8" },
-  ];
-
-  const element = () => (
-    <TouchableOpacity>
-      <View style={styles.btn}>
-        <Text style={styles.btnText}>DELETE</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowFirstDatePicker(Platform.OS === "ios");
-    setDate(currentDate);
-  };
-
-  const onSecondChange = (event, selectedDate) => {
-    const currentDate = selectedDate || secondDate;
-    setShowSecondDatePicker(Platform.OS === "ios");
-    setSecondDate(currentDate);
-  };
-
-  const showFirstDatepicker = () => {
-    setShowFirstDatePicker(true);
-  };
-
-  const showSecondDatepicker = () => {
-    setShowSecondDatePicker(true);
+    setSelectedStartDate(null);
+    setSelectedEndDate(null);
   };
 
   const containerStyle = { backgroundColor: "white", padding: 20 };
@@ -120,20 +88,33 @@ const Projects = () => {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <Table style={{ borderColor: "black" }}>
-          <Row data={tableHead} style={styles.head} textStyle={styles.text} />
-          {tableData.map((rowData, index) => (
-            <TableWrapper key={index} style={styles.row}>
-              {rowData.map((cellData, cellIndex) => (
-                <Cell
-                  key={cellIndex}
-                  data={cellIndex === 3 ? element(cellData, index) : cellData}
-                  textStyle={styles.text}
-                />
-              ))}
-            </TableWrapper>
-          ))}
-        </Table>
+        <DataTable
+          style={{
+            backgroundColor: "white",
+            padding: 10,
+          }}
+        >
+          <DataTable>
+            <DataTable.Header style={{ height: 60 }}>
+              <DataTable.Title>Name</DataTable.Title>
+              <DataTable.Title>Status</DataTable.Title>
+              <DataTable.Title>Due Date</DataTable.Title>
+              <DataTable.Title>Actions</DataTable.Title>
+            </DataTable.Header>
+            <DataTable.Row>
+              <DataTable.Cell>sample 1</DataTable.Cell>
+              <DataTable.Cell>sample 2</DataTable.Cell>
+              <DataTable.Cell>sample 3</DataTable.Cell>
+              <DataTable.Cell>
+                <TouchableOpacity>
+                  <Button style={{ backgroundColor: "red" }}>
+                    <Text style={{ color: "white" }}>DELETE</Text>
+                  </Button>
+                </TouchableOpacity>
+              </DataTable.Cell>
+            </DataTable.Row>
+          </DataTable>
+        </DataTable>
       </ScrollView>
       <View style={styles.plusButton}>
         <Portal>
@@ -160,69 +141,34 @@ const Projects = () => {
                     label="Task Name"
                     mode="outlined"
                     value={taskName}
-                    onChangeText={settaskName}
+                    onChangeText={setTaskName}
                   />
                 </View>
                 <View style={styles.inputs}>
-                  <View style={{ flexDirection: "row", gap: 20 }}>
-                    <TouchableOpacity onPress={showFirstDatepicker}>
-                      <TextInput
-                        label="Select Start-Date"
-                        mode="outlined"
-                        value={formatDate(date)}
-                        editable={false}
-                        style={styles.inputDate}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={showSecondDatepicker}>
-                      <TextInput
-                        label="Select End-Date"
-                        mode="outlined"
-                        value={formatDate(secondDate)}
-                        editable={false}
-                        style={styles.inputDate}
-                      />
-                    </TouchableOpacity>
-                  </View>
-
-                  {showFirstDatePicker && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date || new Date()}
-                      mode="date"
-                      is24Hour={true}
-                      display="default"
-                      onChange={onChange}
+                  <TouchableOpacity>
+                    <DueDateDropdown
+                      setSelectedStartDate={setSelectedStartDate}
+                      setSelectedEndDate={setSelectedEndDate}
                     />
-                  )}
-                  {showSecondDatePicker && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={secondDate || new Date()}
-                      mode="date"
-                      is24Hour={true}
-                      display="default"
-                      onChange={onSecondChange}
-                    />
-                  )}
+                  </TouchableOpacity>
                 </View>
-
                 <View style={styles.inputs}>
-                  <Dropdown
-                    style={styles.dropdown}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    inputSearchStyle={styles.inputSearchStyle}
-                    iconStyle={styles.iconStyle}
-                    data={data}
-                    search
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder="Select Assignee"
-                    searchPlaceholder="Search..."
-                    value={assignee}
-                  />
+                  <Text>Select Assignee:</Text>
+                  <Picker
+                    selectedValue={assignee}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setAssignee(itemValue)
+                    }
+                  >
+                    <Picker.Item label="Select Assignee" value="" />
+                    {userData.map((user) => (
+                      <Picker.Item
+                        key={user.id}
+                        label={user.username}
+                        value={user.id}
+                      />
+                    ))}
+                  </Picker>
                 </View>
 
                 <View style={styles.inputs}>
@@ -233,7 +179,6 @@ const Projects = () => {
                     onChangeText={setDescription}
                   />
                 </View>
-
                 <View style={styles.modalButtons}>
                   <Button style={styles.modaButtonCancel} onPress={hideModal}>
                     <Text style={{ color: "white" }}>Cancel</Text>
@@ -305,39 +250,6 @@ const styles = StyleSheet.create({
   title: {
     marginBottom: 10,
   },
-  dropdown: {
-    height: 50,
-    borderColor: "gray",
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  label: {
-    position: "absolute",
-    backgroundColor: "white",
-    left: 22,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
 });
 
-export default Projects;
+export default Tasks;

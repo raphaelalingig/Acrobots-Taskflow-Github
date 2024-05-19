@@ -8,41 +8,25 @@ import {
   Platform,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { Table, TableWrapper, Row, Cell } from "react-native-table-component";
-import { Portal, Modal, TextInput, Text, Button } from "react-native-paper";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import {
+  Portal,
+  Modal,
+  TextInput,
+  Text,
+  Button,
+  DataTable,
+} from "react-native-paper";
 import axios from "axios";
-
-const formatDate = (date) => {
-  if (!date) return "";
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+import DueDateDropdown from "./DueDateDropdown/DueDate";
 
 const Projects = () => {
-  const [tableHead] = useState([
-    "Project Name",
-    "Status",
-    "Due date",
-    "Actions",
-  ]);
-  const [tableData, setTableData] = useState([
-    ["Project A", "In Progress", "2024/05/20", "4"],
-    ["Project B", "Completed", "2024/05/15", "d"],
-    ["Project C", "Not Started", "2024/05/25", "4"],
-    ["Project D", "Delayed", "2024/05/30", "d"],
-  ]);
   const [modalVisible, setModalVisible] = useState(false);
   const [date, setDate] = useState(null);
   const [secondDate, setSecondDate] = useState(null);
-
-  const [showFirstDatePicker, setShowFirstDatePicker] = useState(false);
-  const [showSecondDatePicker, setShowSecondDatePicker] = useState(false);
-
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
+  const [selectedStartDate, setSelectedStartDate] = useState("");
+  const [selectedEndDate, setSelectedEndDate] = useState("");
 
   const showModal = () => {
     setModalVisible(true);
@@ -51,14 +35,18 @@ const Projects = () => {
   const hideModal = () => {
     setModalVisible(false);
   };
+
   const postdata = async () => {
     try {
-      const response = await axios.post("http://127.0.0.1:8080/api/projects/", {
-        project_name: projectName,
-        start_date: date,
-        due_date: secondDate,
-        description: description,
-      });
+      const response = await axios.post(
+        "http://192.168.1.15:8080/api/projects/",
+        {
+          project_name: projectName,
+          start_date: selectedStartDate,
+          due_date: selectedEndDate,
+          description: description,
+        }
+      );
       console.log("Project added successfully:", response.data);
     } catch (error) {
       console.error("Error:", error);
@@ -68,42 +56,14 @@ const Projects = () => {
   const handleSubmit = () => {
     console.log("Project Name:", projectName);
     console.log("Description:", description);
-    console.log("Start Date:", formatDate(date));
-    console.log("End Date:", formatDate(secondDate));
+    console.log("Start Date:", selectedStartDate);
+    console.log("End Date:", selectedEndDate);
     postdata();
-    hideModal(true);
+    hideModal();
     setProjectName("");
     setDescription("");
-    setDate(null);
-    setSecondDate(null);
-  };
-
-  const element = () => (
-    <TouchableOpacity >
-      <View style={styles.btn}>
-        <Text style={styles.btnText}>DELETE</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowFirstDatePicker(Platform.OS === "ios");
-    setDate(currentDate);
-  };
-
-  const onSecondChange = (event, selectedDate) => {
-    const currentDate = selectedDate || secondDate;
-    setShowSecondDatePicker(Platform.OS === "ios");
-    setSecondDate(currentDate);
-  };
-
-  const showFirstDatepicker = () => {
-    setShowFirstDatePicker(true);
-  };
-
-  const showSecondDatepicker = () => {
-    setShowSecondDatePicker(true);
+    setSelectedStartDate(null);
+    setSelectedEndDate(null);
   };
 
   const containerStyle = { backgroundColor: "white", padding: 20 };
@@ -111,20 +71,33 @@ const Projects = () => {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <Table style={{ borderColor: "black" }}>
-          <Row data={tableHead} style={styles.head} textStyle={styles.text} />
-          {tableData.map((rowData, index) => (
-            <TableWrapper key={index} style={styles.row}>
-              {rowData.map((cellData, cellIndex) => (
-                <Cell
-                  key={cellIndex}
-                  data={cellIndex === 3 ? element(cellData, index) : cellData}
-                  textStyle={styles.text}
-                />
-              ))}
-            </TableWrapper>
-          ))}
-        </Table>
+        <DataTable
+          style={{
+            backgroundColor: "white",
+            padding: 10,
+          }}
+        >
+          <DataTable>
+            <DataTable.Header style={{ height: 60 }}>
+              <DataTable.Title>Name</DataTable.Title>
+              <DataTable.Title>Status</DataTable.Title>
+              <DataTable.Title>Due Date</DataTable.Title>
+              <DataTable.Title>Actions</DataTable.Title>
+            </DataTable.Header>
+            <DataTable.Row>
+              <DataTable.Cell>sample 1</DataTable.Cell>
+              <DataTable.Cell>sample 2</DataTable.Cell>
+              <DataTable.Cell>sample 3</DataTable.Cell>
+              <DataTable.Cell>
+                <TouchableOpacity>
+                  <Button style={{ backgroundColor: "red" }}>
+                    <Text style={{ color: "white" }}>DELETE</Text>
+                  </Button>
+                </TouchableOpacity>
+              </DataTable.Cell>
+            </DataTable.Row>
+          </DataTable>
+        </DataTable>
       </ScrollView>
       <View style={styles.plusButton}>
         <Portal>
@@ -154,49 +127,15 @@ const Projects = () => {
                     onChangeText={setProjectName}
                   />
                 </View>
-                <View style={styles.inputs}>
-                  <View style={{ flexDirection: "row", gap: 20 }}>
-                    <TouchableOpacity onPress={showFirstDatepicker}>
-                      <TextInput
-                        label="Select Start-Date"
-                        mode="outlined"
-                        value={formatDate(date)}
-                        editable={false}
-                        style={styles.inputDate}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={showSecondDatepicker}>
-                      <TextInput
-                        label="Select End-Date"
-                        mode="outlined"
-                        value={formatDate(secondDate)}
-                        editable={false}
-                        style={styles.inputDate}
-                      />
-                    </TouchableOpacity>
-                  </View>
-
-                  {showFirstDatePicker && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date || new Date()}
-                      mode="date"
-                      is24Hour={true}
-                      display="default"
-                      onChange={onChange}
+                <View>
+                  <TouchableOpacity>
+                    <DueDateDropdown
+                      setSelectedStartDate={setSelectedStartDate}
+                      setSelectedEndDate={setSelectedEndDate}
                     />
-                  )}
-                  {showSecondDatePicker && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={secondDate || new Date()}
-                      mode="date"
-                      is24Hour={true}
-                      display="default"
-                      onChange={onSecondChange}
-                    />
-                  )}
+                  </TouchableOpacity>
                 </View>
+
                 <View style={styles.inputs}>
                   <TextInput
                     label="Description"

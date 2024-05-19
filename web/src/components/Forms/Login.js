@@ -15,10 +15,8 @@ const Login = () => {
     email.length > 0 && loginUser(email, password);
     console.log("Email:" + email);
     console.log("Password:" + password);
-
   };
 
-  
   return (
     <>
       <div>
