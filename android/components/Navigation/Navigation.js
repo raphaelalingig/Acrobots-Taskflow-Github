@@ -15,6 +15,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { AuthProvider, useAuth } from "../Auth/AuthContext";
 import DropDownPicker from "react-native-dropdown-picker";
 import AuthContext from "../Auth/AuthContext";
+import ProjectContent from "../Pages/ProjectContent/ProjectContent";
 
 const BottomTabsNavigator = ({ navigation }) => {
   const { logoutUser } = useContext(AuthContext);
@@ -206,6 +207,7 @@ const Navigation = () => {
             options={{ headerShown: false }}
           />
         )}
+        <Stack.Screen name="All Tasks" component={ProjectContent} />
       </Stack.Navigator>
     </NavigationContainer>
   );

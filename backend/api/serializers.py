@@ -63,7 +63,7 @@ class ProjectSerializers(serializers.ModelSerializer):
 class TaskSerializers(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ('id', 'task_name','project_name', 'start_date', 'due_date', 'assignee', 'description')
+        fields = ('id', 'task_name','project_name', 'start_date', 'due_date', 'assignee', 'description', 'get_project_name')
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,4 +75,9 @@ class GroupProject_Assoc_Serializers(serializers.ModelSerializer):
         model = GroupNprojectAssoc
         fields = ('id', 'group', 'project', 'project_username', 'members')
 
+
+class ProjectTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ('id', 'task_name', 'start_date', 'due_date', 'description', 'project_name', 'assignee', 'get_project_name')
 

@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from api.serializers import MyTokenObtainPairSerializer, RegisterSerializer, TaskSerializers, UserSerializer, GroupSerializer, GroupProject_Assoc_Serializers
+from api.serializers import MyTokenObtainPairSerializer, RegisterSerializer, TaskSerializers, UserSerializer, GroupSerializer, GroupProject_Assoc_Serializers, ProjectTaskSerializer
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -25,6 +25,7 @@ from django.shortcuts import redirect
 from rest_framework import viewsets
 from .serializers import ProjectSerializers
 from .models import Project, Task, Group, GroupNprojectAssoc
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -115,3 +116,24 @@ class GroupProject_Assoc_View(viewsets.ModelViewSet):
     queryset = GroupNprojectAssoc.objects.all()
     serializer_class = GroupProject_Assoc_Serializers
 
+class ProjectTaskView(viewsets.ModelViewSet):
+    serializer_class = ProjectTaskSerializer
+
+    def get_queryset(self):
+        project_name = self.kwargs['project_name']  # Fetch project name from URL kwargs
+        return Task.objects.filter(project_name__project_name=project_name)  # Filter tasks by project name
+
+    def perform_create(self, serializer):
+        project_name = self.kwargs['project_name']  # Fetch project name from URL kwargs
+        project = Project.objects.get(project_name=project_name)  # Fetch project instance
+        serializer.save(project_name=project)  # Save task with project instance
+# class ProjectTaskView(generics.ListCreateAPIView):
+#     serializer_class = ProjectTaskSerializer
+
+#     def get_queryset(self):
+#         project_id = self.kwargs['project_id']
+#         return Task.objects.filter(project_name_id=project_id)
+
+#     def perform_create(self, serializer):
+#         project_id = self.kwargs['project_id']
+#         serializer.save(project_name_id=project_id)

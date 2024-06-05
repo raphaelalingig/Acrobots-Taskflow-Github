@@ -22,7 +22,7 @@ const Header = () => {
           <img src={logopicture}></img>
         </Link>
         <div className="navigations-links flex">
-          <h2 className="links mr-10 text-lg font-semibold hover:underline cursor-pointer">
+          {/* <h2 className="links mr-10 text-lg font-semibold hover:underline cursor-pointer">
             Services
           </h2>
           <h2 className="links mr-10 text-lg font-semibold hover:underline cursor-pointer">
@@ -30,7 +30,7 @@ const Header = () => {
           </h2>
           <h2 className="links mr-10 text-lg font-semibold hover:underline cursor-pointer">
             Contact Us
-          </h2>
+          </h2> */}
         </div>
         {token === null && (
           <Link

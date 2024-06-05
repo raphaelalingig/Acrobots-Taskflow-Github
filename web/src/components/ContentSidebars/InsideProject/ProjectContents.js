@@ -1,20 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Aside from "../../Sidebars.js/Aside";
 import { Link } from "react-router-dom";
 import StatusDropdown from "../../MiniComponents.js/StatusDropdown";
 import DueDateDropdown from "../../MiniComponents.js/DueDateDropdown";
 import PriorityDropdown from "../../MiniComponents.js/PriorityDropdown";
 import AddTask from "../../MiniComponents.js/Modals/AddTask";
+import { useParams } from "react-router-dom/cjs/react-router-dom.min";
+import EditTask from "../../MiniComponents.js/Modals/EditTask";
+import axios from "axios";
 
-const ProjectContents = () => {
+const ProjectContents = ({}) => {
   const [isModalOpen, setModalOpen] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState("");
-  const [selectedEndDate, setSelectedEndDate] = useState("");
-  const [tasks, setTasks] = useState([])
+  const [tasks, setTasks] = useState([]);
+  const { project_name } = useParams();
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [taskData, setTaskData] = useState([]);
+  const swal = require("sweetalert2");
 
+  useEffect(() => {
+    fetchTaskData();
+  }, [project_name]);
+  console.log(project_name);
+
+  const fetchTaskData = async () => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8080/api/projects/${project_name}/tasks/`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      setTaskData(data);
+    } catch (error) {}
+  };
+
+  const updateTask = (updatedTask) => {
+    const updatedTasks = taskData.map((task) =>
+      task.id === updatedTask.id ? updatedTask : task
+    );
+    setTaskData(updatedTasks);
+  };
+
+  const handleEditClick = (task) => {
+    setSelectedTask(task);
+    setEditModalOpen(true);
+  };
   const addNewTask = (newTask) => {
     setTasks([...tasks, newTask]);
-    setModalOpen(false); // Close the modal after adding the task
+    setModalOpen(false);
+  };
+  const deleteTask = async (taskId) => {
+    try {
+      await axios.delete(
+        `http://127.0.0.1:8080/api/projects/${project_name}/tasks/${taskId}/`
+      );
+      // Remove the deleted task from the state
+      setTaskData(taskData.filter((task) => task.id !== taskId));
+      swal.fire({
+        title: "Task deleted successfully",
+        icon: "success",
+        toast: true,
+        timer: 3000,
+        position: "top-right",
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
@@ -115,7 +171,7 @@ const ProjectContents = () => {
                         />
                       </svg>
                       <span class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">
-                        "Current Name Project"
+                        {project_name}
                       </span>
                     </div>
                   </li>
@@ -166,28 +222,56 @@ const ProjectContents = () => {
                 </tr>
               </thead>
               <tbody>
-                {tasks.map((task, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
+                {taskData.map((task) => (
+                  <tr
+                    key={task.id}
+                    value={task.id}
+                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  >
+                    <td class="w-4 p-4">
+                      <div class="flex items-center">
+                        <input
+                          id="checkbox-table-search-1"
+                          type="checkbox"
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <label for="checkbox-table-search-1" class="sr-only">
+                          checkbox
+                        </label>
+                      </div>
                     </td>
-                    <Link to="/groups/view_group">
-                      <a className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-1000 dark:text-gray-400 dark:hover:text-white mt-4">
-                        <td className="px-6 py-4">{task.taskName}</td>
-                      </a>
-                    </Link>
-                    <td className="px-6 py-4">
+                    <th
+                      scope="row"
+                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    >
+                      {task.task_name}
+                    </th>
+                    {/* <td class="px-6 py-4">{task.project_username}</td> */}
+                    <td class="px-6 py-4">
                       <StatusDropdown />
                     </td>
-                    <td className="px-6 py-4">
-                      {task.selectedStartDate} - {task.selectedEndDate}
+                    <td class="px-6 py-4">
+                      {task.start_date} - {task.due_date}
                     </td>
-                    <td className="px-6 py-4">{task.asignee}</td>
-                    <td className="px-6 py-4">
+                    <td class="px-6 py-4">{task.get_user_name}</td>
+                    <td class="px-6 py-4">
                       <PriorityDropdown />
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        type="button"
+                        class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                        onClick={() => handleEditClick(task)}
+                      >
+                        EDIT
+                      </button>
+                      <button
+                        type="button"
+                        class="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                        onClick={() => deleteTask(task.id)}
+                      >
+                        DELETE
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -195,7 +279,18 @@ const ProjectContents = () => {
             </table>
           </div>
           {isModalOpen && (
-            <AddTask closemodal={setModalOpen} addNewTask={addNewTask} />
+            <AddTask
+              closemodal={setModalOpen}
+              addNewTask={addNewTask}
+              project_name={project_name}
+            />
+          )}
+          {isEditModalOpen && (
+            <EditTask
+              closemodal={setEditModalOpen}
+              task={selectedTask}
+              updateTask={updateTask}
+            />
           )}
         </div>
       </div>

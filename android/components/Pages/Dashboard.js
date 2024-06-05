@@ -1,37 +1,72 @@
-import React, { Component } from "react";
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View, ScrollView } from "react-native";
 import { Text } from "react-native-paper";
 
 const Dashboard = () => {
+  const [projectData, setProjectData] = useState([]);
+  const [taskData, setTaskData] = useState([]);
+
+  useEffect(() => {
+    fetchProjectData();
+    fetchTaskData();
+  }, []);
+
+  const fetchProjectData = async () => {
+    try {
+      const response = await fetch("http://192.168.1.15:8080/api/projects/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch Project Data");
+      }
+      const data = await response.json();
+      setProjectData(data);
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  };
+
+  const fetchTaskData = async () => {
+    try {
+      const response = await fetch("http://192.168.1.15:8080/api/task/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch Task Data");
+      }
+      const data = await response.json();
+      setTaskData(data);
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.taskContent}>
         <View style={styles.taskStatus}>
           <View style={styles.opentask}>
-            <Text>Open Tasks</Text>
-            <Text>10</Text>
+            <Text>Open Projects</Text>
+            <Text>{projectData.length}</Text>
           </View>
           <View style={styles.closetask}>
-            <Text>Close Tasks</Text>
-            <Text>10</Text>
+            <Text>Open Tasks</Text>
+            <Text>{taskData.length}</Text>
           </View>
         </View>
       </View>
+
       <View style={styles.projectContent}>
         <Text style={styles.projectTitle}>Available Projects: </Text>
-        <Text style={styles.projectNames}>sample projects</Text>
-        <Text style={styles.projectNames}>sample projects</Text>
+        {projectData.map((project) => (
+          <View key={project.id} value={project.id}>
+            <Text style={styles.projectNames}>{project.project_name}</Text>
+          </View>
+        ))}
       </View>
       <View style={styles.tasksContent}>
-        <Text style={styles.projectTitle}>Available Projects: </Text>
-        <Text style={styles.projectNames}>sample projects</Text>
-        <Text style={styles.projectNames}>sample projects</Text>
+        <Text style={styles.projectTitle}>Available Tasks: </Text>
+        {taskData.map((task) => (
+          <View key={task.id} value={task.id}>
+            <Text style={styles.projectNames}>{task.task_name}</Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
@@ -41,39 +76,37 @@ export default Dashboard;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
+    padding: 20,
     alignItems: "center",
-    backgroundColor: "#D9D9D9",
   },
   taskContent: {
     padding: 20,
     backgroundColor: "white",
     borderRadius: 20,
+    width: "100%",
+    marginBottom: 20,
   },
   taskStatus: {
     flexDirection: "row",
-    gap: 90,
+    justifyContent: "space-between",
   },
   projectContent: {
-    marginTop: 20,
-    paddingVertical: 20,
-    paddingHorizontal: 80,
+    padding: 20,
     backgroundColor: "white",
     borderRadius: 20,
+    width: "100%",
+    marginBottom: 20,
   },
   projectTitle: {
-    right: "30%",
+    marginBottom: 10,
   },
   projectNames: {
-    left: "20%",
     marginBottom: 5,
   },
   tasksContent: {
-    marginTop: 20,
-    paddingVertical: 20,
-    paddingHorizontal: 80,
+    padding: 20,
     backgroundColor: "white",
     borderRadius: 20,
+    width: "100%",
   },
 });

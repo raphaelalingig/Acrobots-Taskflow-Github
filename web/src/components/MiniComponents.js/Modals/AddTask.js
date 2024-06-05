@@ -3,13 +3,13 @@ import DueDateDropdown from "../DueDateDropdown";
 import PriorityDropdown from "../PriorityDropdown";
 import axios from "axios";
 
-const AddTask = ({ closemodal, addNewTask }) => {
+const AddTask = ({ closemodal, addNewTask, project_name }) => {
   const [taskName, setTaskName] = useState("");
   const [asignee, setAsignee] = useState("");
   const [description, setDescription] = useState("");
   const [selectedStartDate, setSelectedStartDate] = useState("");
   const [selectedEndDate, setSelectedEndDate] = useState("");
-  const [projectName, setProjectName] = useState([]);
+  const [projectName, setProjectName] = useState("");
   const [projectData, setProjectData] = useState([]);
   const [userdata, setUserData] = useState([]);
   const swal = require("sweetalert2");
@@ -48,7 +48,7 @@ const AddTask = ({ closemodal, addNewTask }) => {
     try {
       const response = await axios.post("http://127.0.0.1:8080/api/task/", {
         task_name: taskName,
-        // project_name: projectName,
+        project_name: projectName,
         assignee: asignee,
         description: description,
         start_date: selectedStartDate,
@@ -148,8 +148,11 @@ const AddTask = ({ closemodal, addNewTask }) => {
                 />
               </div>
               <div>
-                {/* <label className="block  w-full mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Project Name
+                <label
+                  for="name"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Project: Please Select "{project_name}"
                 </label>
 
                 <select
@@ -157,17 +160,20 @@ const AddTask = ({ closemodal, addNewTask }) => {
                   name="project"
                   id="project"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required=""
+                  placeholder="Appointed person"
+                  required
                   onChange={(e) => {
                     setProjectName(e.target.value);
                   }}
                 >
+                  <option>Select a Project:</option>
+
                   {projectData.map((project) => (
                     <option key={project.id} value={project.id}>
                       {project.project_name}
                     </option>
                   ))}
-                </select> */}
+                </select>
               </div>
 
               <div>
@@ -195,7 +201,6 @@ const AddTask = ({ closemodal, addNewTask }) => {
                   name="asignee"
                   id="asignee"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="Appointed person"
                   required
                   onChange={(e) => {
                     setAsignee(e.target.value);

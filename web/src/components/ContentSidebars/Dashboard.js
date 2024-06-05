@@ -1,7 +1,39 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Aside from "../Sidebars.js/Aside";
 
 const Dashboard = () => {
+  const [projectData, setProjectData] = useState([]);
+  const [taskData, setTaskData] = useState([]);
+
+  useEffect(() => {
+    fetchprojects();
+    fetchtasks();
+  }, []);
+  const fetchprojects = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8080/api/projects/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      setProjectData(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  const fetchtasks = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8080/api/task/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      setTaskData(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  console.log("ProjectData: ", projectData);
   return (
     <>
       <Aside />
@@ -10,35 +42,45 @@ const Dashboard = () => {
         <div class="p-4 border-2 border-gray-200 bg-gray-200 border-dashed rounded-lg dark:border-gray-700">
           <div class="grid grid-cols-2 gap-4 mb-4 bg-">
             <div class="flex items-center  justify-center h-24 rounded bg-gray-50 dark:bg-gray-800">
-              <p class="text-2xl text-black-50 dark:text-gray-500">
-                Open Tasks: 10
-              </p>
+              <p class="text-2xl text-black-50 dark:text-gray-500">Open Projects: {projectData.length}</p>
             </div>
             <div class="flex items-center justify-center h-24 rounded bg-gray-50 dark:bg-gray-800">
               <p class="text-2xl text-black-50 dark:text-gray-500">
-                Closed Tasks: 0
+                Open Tasks: {taskData.length}
               </p>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="flex rounded bg-gray-50 h-48 dark:bg-gray-800">
-              <div class="text-xl m-10 text-black-50 dark:text-gray-500">
-                <p>Projects:</p>{" "}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="flex rounded bg-gray-50 dark:bg-gray-800">
+              <div
+                className="text-xl m-10 text-black-50 dark:text-gray-500 overflow-y-auto"
+                style={{ height: "20rem", width: "40rem" }}
+              >
+                <p>Projects:</p>
                 <div className="ml-24">
-                  <p> sample project</p>
-                  <p> sample second project</p>
+                  {projectData.map((project) => (
+                    <p key={project.id} value={project.id}>
+                      {project.project_name}
+                    </p>
+                  ))}
                 </div>
               </div>
             </div>
-            <div class="flex rounded bg-gray-50 h-48 dark:bg-gray-800">
-              <p class="text-xl m-10 text-black-50 dark:text-gray-500">
-                <p>Available Tasks:</p>{" "}
+            <div className="flex rounded bg-gray-50 dark:bg-gray-800">
+              <div
+                className="text-xl m-10 text-black-50 dark:text-gray-500 overflow-y-auto"
+                style={{ height: "20rem", width: "40rem" }}
+              >
+                <p>Task:</p>
                 <div className="ml-24">
-                  <p> sample task</p>
-                  <p> sample second task</p>
+                  {taskData.map((task) => (
+                    <p key={task.id} value={task.id}>
+                      {task.task_name}
+                    </p>
+                  ))}
                 </div>
-              </p>
+              </div>
             </div>
             <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
               <p class="text-2xl text-gray-400 dark:text-gray-500">

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import picture from "../../assets/taskflowlogo.png";
 import AuthContext from "../Auth/AuthContext";
@@ -7,6 +7,39 @@ import { jwtDecode } from "jwt-decode";
 const Aside = ({}) => {
   const { logoutUser } = useContext(AuthContext);
   const token = localStorage.getItem("authTokens");
+  const [projectData, setProjectData] = useState([]);
+  const [taskData, setTaskData] = useState([]);
+
+  useEffect(() => {
+    fetchprojects();
+    fetchtasks();
+  }, []);
+
+  const fetchprojects = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8080/api/projects/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      setProjectData(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  const fetchtasks = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8080/api/task/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      setTaskData(data); // Set the retrieved users in state
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error if needed
+    }
+  };
 
   if (token) {
     const decoded = jwtDecode(token);
@@ -64,13 +97,13 @@ const Aside = ({}) => {
                     Projects
                   </span>
                   <span className="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
-                    Pro
+                    {projectData.length}
                   </span>
                 </a>
               </li>
             </Link>
 
-            <Link to="/tasks">
+            {/* <Link to="/tasks">
               <li>
                 <a
                   href="#"
@@ -93,9 +126,12 @@ const Aside = ({}) => {
                   </svg>
 
                   <span className="flex-1 ms-3 whitespace-nowrap">Tasks</span>
+                  <span className="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
+                    {taskData.length}
+                  </span>
                 </a>
               </li>
-            </Link>
+            </Link> */}
             <Link to="/groups">
               <li>
                 <a
@@ -112,37 +148,6 @@ const Aside = ({}) => {
                     <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
                   </svg>
                   <span class="flex-1 ms-3 whitespace-nowrap">Groups</span>
-                </a>
-              </li>
-            </Link>
-
-            <Link to="/calendar">
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                >
-                  <svg
-                    className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="3 2 21 20"
-                  >
-                    <path
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"
-                    />
-                  </svg>
-
-                  <span className="flex-1 ms-3 whitespace-nowrap">
-                    Calendar
-                  </span>
                 </a>
               </li>
             </Link>

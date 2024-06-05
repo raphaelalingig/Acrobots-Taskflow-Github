@@ -83,3 +83,7 @@ class Task(models.Model):
     def __str__(self):
         return self.task_name
 
+    def get_project_name(self):
+        if self.project_name:
+            return self.project_name.project_name
+        return None

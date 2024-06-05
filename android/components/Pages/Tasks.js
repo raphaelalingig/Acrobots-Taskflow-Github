@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Platform,
-} from "react-native";
+import { StyleSheet, View, TouchableOpacity, ScrollView } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import {
   Portal,
@@ -19,6 +12,12 @@ import {
 import axios from "axios";
 import DueDateDropdown from "./DueDateDropdown/DueDate";
 import { Picker } from "@react-native-picker/picker";
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+  Toast,
+} from "react-native-alert-notification";
 
 const Tasks = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,10 +27,13 @@ const Tasks = () => {
   const [selectedEndDate, setSelectedEndDate] = useState("");
   const [assignee, setAssignee] = useState("");
   const [userData, setUserData] = useState([]);
+  const [taskData, setTaskData] = useState([]);
 
   useEffect(() => {
     fetchUserData();
+    fetchTaskData();
   }, []);
+
   const fetchUserData = async () => {
     try {
       const response = await fetch("http://192.168.1.15:8080/api/user/");
@@ -45,6 +47,20 @@ const Tasks = () => {
       console.log("Error: ", error);
     }
   };
+
+  const fetchTaskData = async () => {
+    try {
+      const response = await fetch("http://192.168.1.15:8080/api/task/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch Task Data");
+      }
+      const data = await response.json();
+      setTaskData(data);
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  };
+
   const postdata = async () => {
     try {
       const response = await axios.post("http://192.168.1.15:8080/api/task/", {
@@ -55,6 +71,12 @@ const Tasks = () => {
         due_date: selectedEndDate,
       });
       console.log("Task added successfully", response.data);
+      Toast.show({
+        type: ALERT_TYPE.SUCCESS,
+        title: "Success",
+        textBody: "Task added Successfully",
+      });
+      fetchTaskData(); // Refresh the task list
     } catch (error) {
       console.log("Error:", error);
     }
@@ -68,13 +90,14 @@ const Tasks = () => {
     setModalVisible(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("Task Name:", taskName);
     console.log("Description:", description);
     console.log("Start Date:", selectedStartDate);
     console.log("End Date:", selectedEndDate);
     console.log("Assignee: ", assignee);
-    postdata();
+    await postdata();
+    await fetchTaskData();
     hideModal();
     setTaskName("");
     setAssignee("");
@@ -83,121 +106,152 @@ const Tasks = () => {
     setSelectedEndDate(null);
   };
 
+  const deleteTask = async (taskId) => {
+    try {
+      await axios.delete(`http://192.168.1.15:8080/api/task/${taskId}/`);
+      // Remove the deleted task from the state
+      setTaskData(taskData.filter((task) => task.id !== taskId));
+      Toast.show({
+        type: ALERT_TYPE.SUCCESS,
+        title: "Success",
+        textBody: "Task deleted Successfully",
+      });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const containerStyle = { backgroundColor: "white", padding: 20 };
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <DataTable
-          style={{
-            backgroundColor: "white",
-            padding: 10,
-          }}
-        >
-          <DataTable>
+      <AlertNotificationRoot>
+        <View style={{ width: 100, marginBottom: 5 }}>
+          <TouchableOpacity>
+            <Button style={{ backgroundColor: "#3378f6" }}>
+              <Text style={{ color: "white" }}>Refresh</Text>
+            </Button>
+          </TouchableOpacity>
+        </View>
+        <ScrollView>
+          <DataTable
+            style={{
+              backgroundColor: "white",
+              padding: 2,
+              marginBottom: 90,
+            }}
+          >
             <DataTable.Header style={{ height: 60 }}>
               <DataTable.Title>Name</DataTable.Title>
-              <DataTable.Title>Status</DataTable.Title>
+              <DataTable.Title>Start Date</DataTable.Title>
               <DataTable.Title>Due Date</DataTable.Title>
               <DataTable.Title>Actions</DataTable.Title>
             </DataTable.Header>
-            <DataTable.Row>
-              <DataTable.Cell>sample 1</DataTable.Cell>
-              <DataTable.Cell>sample 2</DataTable.Cell>
-              <DataTable.Cell>sample 3</DataTable.Cell>
-              <DataTable.Cell>
-                <TouchableOpacity>
-                  <Button style={{ backgroundColor: "red" }}>
-                    <Text style={{ color: "white" }}>DELETE</Text>
-                  </Button>
-                </TouchableOpacity>
-              </DataTable.Cell>
-            </DataTable.Row>
-          </DataTable>
-        </DataTable>
-      </ScrollView>
-      <View style={styles.plusButton}>
-        <Portal>
-          <Modal
-            visible={modalVisible}
-            onDismiss={hideModal}
-            contentContainerStyle={containerStyle}
-          >
-            <View style={styles.modal}>
-              <View style={styles.title}>
-                <Text variant="headlineSmall">New Task: </Text>
-              </View>
-              <View
-                style={{
-                  borderWidth: 0.5,
-                  backgroundColor: "#D9D9D9",
-                  margin: 5,
-                }}
-              ></View>
-
-              <View style={styles.bodyText}>
-                <View style={styles.inputs}>
-                  <TextInput
-                    label="Task Name"
-                    mode="outlined"
-                    value={taskName}
-                    onChangeText={setTaskName}
-                  />
-                </View>
-                <View style={styles.inputs}>
-                  <TouchableOpacity>
-                    <DueDateDropdown
-                      setSelectedStartDate={setSelectedStartDate}
-                      setSelectedEndDate={setSelectedEndDate}
-                    />
+            {taskData.map((task) => (
+              <DataTable.Row key={task.id} value={task.id}>
+                <DataTable.Cell style={{ marginRight: 3 }}>
+                  {task.task_name}
+                </DataTable.Cell>
+                <DataTable.Cell style={{ marginHorizontal: 3 }}>
+                  {task.start_date}
+                </DataTable.Cell>
+                <DataTable.Cell style={{ marginHorizontal: 3 }}>
+                  {task.due_date}
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <TouchableOpacity
+                    style={{ backgroundColor: "red", borderRadius: 5 }}
+                    onPress={() => deleteTask(task.id)}
+                  >
+                    <Text style={{ color: "white", padding: 3 }}>DELETE</Text>
                   </TouchableOpacity>
+                </DataTable.Cell>
+              </DataTable.Row>
+            ))}
+          </DataTable>
+        </ScrollView>
+        <View style={styles.plusButton}>
+          <Portal>
+            <Modal
+              visible={modalVisible}
+              onDismiss={hideModal}
+              contentContainerStyle={containerStyle}
+            >
+              <View style={styles.modal}>
+                <View style={styles.title}>
+                  <Text variant="headlineSmall">New Task: </Text>
                 </View>
-                <View style={styles.inputs}>
-                  <Text>Select Assignee:</Text>
-                  <Picker
-                    selectedValue={assignee}
-                    onValueChange={(itemValue, itemIndex) =>
-                      setAssignee(itemValue)
-                    }
-                  >
-                    <Picker.Item label="Select Assignee" value="" />
-                    {userData.map((user) => (
-                      <Picker.Item
-                        key={user.id}
-                        label={user.username}
-                        value={user.id}
-                      />
-                    ))}
-                  </Picker>
-                </View>
+                <View
+                  style={{
+                    borderWidth: 0.5,
+                    backgroundColor: "#D9D9D9",
+                    margin: 5,
+                  }}
+                ></View>
 
-                <View style={styles.inputs}>
-                  <TextInput
-                    label="Description"
-                    mode="outlined"
-                    value={description}
-                    onChangeText={setDescription}
-                  />
-                </View>
-                <View style={styles.modalButtons}>
-                  <Button style={styles.modaButtonCancel} onPress={hideModal}>
-                    <Text style={{ color: "white" }}>Cancel</Text>
-                  </Button>
-                  <Button
-                    style={styles.modaButtonSubmit}
-                    onPress={handleSubmit}
-                  >
-                    <Text style={{ color: "white" }}>Submit</Text>
-                  </Button>
+                <View style={styles.bodyText}>
+                  <View style={styles.inputs}>
+                    <TextInput
+                      label="Task Name"
+                      mode="outlined"
+                      value={taskName}
+                      onChangeText={setTaskName}
+                    />
+                  </View>
+                  <View style={styles.inputs}>
+                    <TouchableOpacity>
+                      <DueDateDropdown
+                        setSelectedStartDate={setSelectedStartDate}
+                        setSelectedEndDate={setSelectedEndDate}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.inputs}>
+                    <Picker
+                      selectedValue={assignee}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setAssignee(itemValue)
+                      }
+                    >
+                      <Picker.Item label="Select Assignee" value="" />
+                      {userData.map((user) => (
+                        <Picker.Item
+                          key={user.id}
+                          label={user.username}
+                          value={user.id}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+
+                  <View style={styles.inputs}>
+                    <TextInput
+                      label="Description"
+                      mode="outlined"
+                      value={description}
+                      onChangeText={setDescription}
+                    />
+                  </View>
+                  <View style={styles.modalButtons}>
+                    <Button style={styles.modaButtonCancel} onPress={hideModal}>
+                      <Text style={{ color: "white" }}>Cancel</Text>
+                    </Button>
+                    <Button
+                      style={styles.modaButtonSubmit}
+                      onPress={handleSubmit}
+                    >
+                      <Text style={{ color: "white" }}>Submit</Text>
+                    </Button>
+                  </View>
                 </View>
               </View>
-            </View>
-          </Modal>
-        </Portal>
-        <TouchableOpacity onPress={showModal}>
-          <AntDesign name="pluscircle" size={64} color="black" />
-        </TouchableOpacity>
-      </View>
+            </Modal>
+          </Portal>
+          <TouchableOpacity onPress={showModal}>
+            <AntDesign name="pluscircle" size={64} color="black" />
+          </TouchableOpacity>
+        </View>
+      </AlertNotificationRoot>
     </View>
   );
 };
