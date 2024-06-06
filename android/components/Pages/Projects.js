@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, TouchableOpacity, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Platform,
+} from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import {
   Portal,
@@ -13,11 +20,12 @@ import axios from "axios";
 import DueDateDropdown from "./DueDateDropdown/DueDate";
 import {
   ALERT_TYPE,
+  Dialog,
   AlertNotificationRoot,
   Toast,
 } from "react-native-alert-notification";
 
-const Projects = ({ navigation }) => {
+const Projects = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const [projectName, setProjectName] = useState("");
@@ -32,7 +40,7 @@ const Projects = ({ navigation }) => {
 
   const fetchProjectData = async () => {
     try {
-      const response = await fetch("http://192.168.1.15:8080/api/projects/");
+      const response = await fetch("http://172.20.8.129:8080/api/projects/");
       if (!response.ok) {
         throw new Error("Failed to fetch Project Data");
       }
@@ -54,7 +62,7 @@ const Projects = ({ navigation }) => {
   const postdata = async () => {
     try {
       const response = await axios.post(
-        "http://192.168.1.15:8080/api/projects/",
+        "http://172.20.8.129:8080/api/projects/",
         {
           project_name: projectName,
           start_date: selectedStartDate,
@@ -73,10 +81,9 @@ const Projects = ({ navigation }) => {
       console.error("Error:", error);
     }
   };
-
   const deleteProject = async (projectId) => {
     try {
-      await axios.delete(`http://192.168.1.15:8080/api/projects/${projectId}/`);
+      await axios.delete(`http://172.20.8.129:8080/api/projects/${projectId}/`);
       // Remove the deleted group from the state
       setProjectData(projectData.filter((project) => project.id !== projectId));
     } catch (error) {
@@ -102,7 +109,6 @@ const Projects = ({ navigation }) => {
       console.error("Error:", error);
     }
   };
-
   const containerStyle = { backgroundColor: "white", padding: 20 };
 
   return (
@@ -112,7 +118,7 @@ const Projects = ({ navigation }) => {
           <DataTable
             style={{
               backgroundColor: "white",
-              padding: 2,
+              padding: 10,
               marginBottom: 90,
             }}
           >
@@ -124,33 +130,29 @@ const Projects = ({ navigation }) => {
                 <DataTable.Title>Actions</DataTable.Title>
               </DataTable.Header>
               {projectData.map((project) => (
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("All Tasks")}
-                >
-                  <DataTable.Row key={project.id}>
-                    <DataTable.Cell style={{ marginRight: 3 }}>
-                      {project.project_name}
-                    </DataTable.Cell>
-                    <DataTable.Cell style={{ marginHorizontal: 3 }}>
-                      {project.start_date}
-                    </DataTable.Cell>
-                    <DataTable.Cell style={{ marginHorizontal: 3 }}>
-                      {project.due_date}
-                    </DataTable.Cell>
-                    <DataTable.Cell>
-                      <TouchableOpacity
-                        style={{ backgroundColor: "red", borderRadius: 5 }}
+                <DataTable.Row key={project.id} value={project.id}>
+                  <DataTable.Cell style={{ marginRight: 3 }}>
+                    {project.project_name}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={{ marginHorizontal: 3 }}>
+                    {project.start_date}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={{ marginHorizontal: 3 }}>
+                    {project.due_date}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={{}}>
+                    <TouchableOpacity
+                      style={{ backgroundColor: "red", borderRadius: 5 }}
+                    >
+                      <Text
+                        onPress={() => deleteProject(project.id)}
+                        style={{ color: "white", padding: 3 }}
                       >
-                        <Text
-                          onPress={() => deleteProject(project.id)}
-                          style={{ color: "white", padding: 3 }}
-                        >
-                          DELETE
-                        </Text>
-                      </TouchableOpacity>
-                    </DataTable.Cell>
-                  </DataTable.Row>
-                </TouchableOpacity>
+                        DELETE
+                      </Text>
+                    </TouchableOpacity>
+                  </DataTable.Cell>
+                </DataTable.Row>
               ))}
             </DataTable>
           </DataTable>

@@ -57,6 +57,7 @@ class Project(models.Model):
     start_date = models.DateField()
     due_date = models.DateField()
     description = models.TextField()
+    group = models.ManyToManyField(Group)
 
     def __str__(self):
         return self.project_name
@@ -87,3 +88,9 @@ class Task(models.Model):
         if self.project_name:
             return self.project_name.project_name
         return None
+    
+    def get_user_name(self):
+        if self.assignee:
+            return self.assignee.username
+        return None
+

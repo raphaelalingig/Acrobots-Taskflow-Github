@@ -13,7 +13,7 @@ const Dashboard = () => {
 
   const fetchProjectData = async () => {
     try {
-      const response = await fetch("http://192.168.1.15:8080/api/projects/");
+      const response = await fetch("http://172.20.8.129:8080/api/projects/");
       if (!response.ok) {
         throw new Error("Failed to fetch Project Data");
       }
@@ -26,7 +26,7 @@ const Dashboard = () => {
 
   const fetchTaskData = async () => {
     try {
-      const response = await fetch("http://192.168.1.15:8080/api/task/");
+      const response = await fetch("http://172.20.8.129:8080/api/task/");
       if (!response.ok) {
         throw new Error("Failed to fetch Task Data");
       }

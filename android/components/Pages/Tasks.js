@@ -36,7 +36,7 @@ const Tasks = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch("http://192.168.1.15:8080/api/user/");
+      const response = await fetch("http://172.20.8.129:8080/api/user/");
       if (!response.ok) {
         console.log("Failed to fetch Users");
         throw new Error("Failed to fetch Users");
@@ -50,7 +50,7 @@ const Tasks = () => {
 
   const fetchTaskData = async () => {
     try {
-      const response = await fetch("http://192.168.1.15:8080/api/task/");
+      const response = await fetch("http://172.20.8.129:8080/api/task/");
       if (!response.ok) {
         throw new Error("Failed to fetch Task Data");
       }
@@ -63,7 +63,7 @@ const Tasks = () => {
 
   const postdata = async () => {
     try {
-      const response = await axios.post("http://192.168.1.15:8080/api/task/", {
+      const response = await axios.post("http://172.20.8.129:8080/api/task/", {
         task_name: taskName,
         assignee: assignee,
         description: description,
@@ -108,7 +108,7 @@ const Tasks = () => {
 
   const deleteTask = async (taskId) => {
     try {
-      await axios.delete(`http://192.168.1.15:8080/api/task/${taskId}/`);
+      await axios.delete(`http://172.20.8.129:8080/api/task/${taskId}/`);
       // Remove the deleted task from the state
       setTaskData(taskData.filter((task) => task.id !== taskId));
       Toast.show({
@@ -126,18 +126,11 @@ const Tasks = () => {
   return (
     <View style={styles.container}>
       <AlertNotificationRoot>
-        <View style={{ width: 100, marginBottom: 5 }}>
-          <TouchableOpacity>
-            <Button style={{ backgroundColor: "#3378f6" }}>
-              <Text style={{ color: "white" }}>Refresh</Text>
-            </Button>
-          </TouchableOpacity>
-        </View>
         <ScrollView>
           <DataTable
             style={{
               backgroundColor: "white",
-              padding: 2,
+              padding: 10,
               marginBottom: 90,
             }}
           >

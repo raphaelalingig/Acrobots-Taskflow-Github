@@ -48,19 +48,9 @@ const Groups = () => {
     fetchGroupData();
   }, []);
 
-  const refresh = () => {
-    try {
-      fetchUserData();
-      fetchProjectData();
-      fetchGroupData();
-      console.log("reload successfully");
-    } catch (error) {
-      throw new Error("Failed to refresh");
-    }
-  };
   const fetchUserData = async () => {
     try {
-      const response = await fetch("http://192.168.1.15:8080/api/user/");
+      const response = await fetch("http://172.20.8.129:8080/api/user/");
       if (!response.ok) {
         throw new Error("Failed to fetch Users");
       }
@@ -73,7 +63,7 @@ const Groups = () => {
 
   const fetchProjectData = async () => {
     try {
-      const response = await fetch("http://192.168.1.15:8080/api/projects/");
+      const response = await fetch("http://172.20.8.129:8080/api/projects/");
       if (!response.ok) {
         throw new Error("Failed to fetch Projects");
       }
@@ -86,7 +76,7 @@ const Groups = () => {
 
   const fetchGroupData = async () => {
     try {
-      const response = await fetch("http://192.168.1.15:8080/api/group/");
+      const response = await fetch("http://172.20.8.129:8080/api/group/");
       if (!response.ok) {
         throw new Error("Failed to fetch Groups");
       }
@@ -99,7 +89,7 @@ const Groups = () => {
 
   const postdata = async () => {
     try {
-      const response = await axios.post("http://192.168.1.15:8080/api/group/", {
+      const response = await axios.post("http://172.20.8.129:8080/api/group/", {
         name: groupName,
         members: assignee,
         projects: projects,
@@ -113,7 +103,7 @@ const Groups = () => {
 
   const deleteGroup = async (groupId) => {
     try {
-      await axios.delete(`http://192.168.1.15:8080/api/group/${groupId}/`);
+      await axios.delete(`http://172.20.8.129:8080/api/group/${groupId}/`);
       // Remove the deleted group from the state
       setGroupData(groupData.filter((group) => group.id !== groupId));
     } catch (error) {
@@ -172,18 +162,11 @@ const Groups = () => {
   return (
     <View style={styles.container}>
       <AlertNotificationRoot>
-        <View style={{ width: 100, marginBottom: 5 }}>
-          <TouchableOpacity onPress={refresh}>
-            <Button style={{ backgroundColor: "#3378f6" }}>
-              <Text style={{ color: "white" }}>Refresh</Text>
-            </Button>
-          </TouchableOpacity>
-        </View>
         <ScrollView>
           <DataTable
             style={{
               backgroundColor: "white",
-              padding: 2,
+              padding: 10,
               marginBottom: 90,
             }}
           >
