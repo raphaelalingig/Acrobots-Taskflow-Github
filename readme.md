@@ -2,6 +2,7 @@ Commands:
 react.js:
 "npm install"
 "npm start"
+change all ip's in the source code in running mobile
 
 backend:
 "venv\Scripts\activate.bat"
