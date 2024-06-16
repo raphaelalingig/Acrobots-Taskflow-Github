@@ -40,7 +40,7 @@ const Projects = () => {
 
   const fetchProjectData = async () => {
     try {
-      const response = await fetch("http://172.20.8.129:8080/api/projects/");
+      const response = await fetch("http://172.22.157.246:8080/api/projects/");
       if (!response.ok) {
         throw new Error("Failed to fetch Project Data");
       }
@@ -62,7 +62,7 @@ const Projects = () => {
   const postdata = async () => {
     try {
       const response = await axios.post(
-        "http://172.20.8.129:8080/api/projects/",
+        "http://172.22.157.246:8080/api/projects/",
         {
           project_name: projectName,
           start_date: selectedStartDate,
@@ -83,7 +83,9 @@ const Projects = () => {
   };
   const deleteProject = async (projectId) => {
     try {
-      await axios.delete(`http://172.20.8.129:8080/api/projects/${projectId}/`);
+      await axios.delete(
+        `http://172.22.157.246:8080/api/projects/${projectId}/`
+      );
       // Remove the deleted group from the state
       setProjectData(projectData.filter((project) => project.id !== projectId));
     } catch (error) {

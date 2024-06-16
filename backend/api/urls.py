@@ -10,6 +10,7 @@ router.register(r'user', views.UserView, 'user' )
 router.register(r'group', views.GroupView, 'group' )
 router.register(r'groupProject_assoc', views.GroupProject_Assoc_View, 'groupProject_assoc' )
 router.register(r'projects/(?P<project_name>[^/.]+)/tasks', views.ProjectTaskView, basename='project-tasks')
+router.register(r'author', views.AuthorView, 'author')
 
 
 

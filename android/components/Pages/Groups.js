@@ -50,7 +50,7 @@ const Groups = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch("http://172.20.8.129:8080/api/user/");
+      const response = await fetch("http://172.22.157.246:8080/api/user/");
       if (!response.ok) {
         throw new Error("Failed to fetch Users");
       }
@@ -63,7 +63,7 @@ const Groups = () => {
 
   const fetchProjectData = async () => {
     try {
-      const response = await fetch("http://172.20.8.129:8080/api/projects/");
+      const response = await fetch("http://172.22.157.246:8080/api/projects/");
       if (!response.ok) {
         throw new Error("Failed to fetch Projects");
       }
@@ -76,7 +76,7 @@ const Groups = () => {
 
   const fetchGroupData = async () => {
     try {
-      const response = await fetch("http://172.20.8.129:8080/api/group/");
+      const response = await fetch("http://172.22.157.246:8080/api/group/");
       if (!response.ok) {
         throw new Error("Failed to fetch Groups");
       }
@@ -89,11 +89,14 @@ const Groups = () => {
 
   const postdata = async () => {
     try {
-      const response = await axios.post("http://172.20.8.129:8080/api/group/", {
-        name: groupName,
-        members: assignee,
-        projects: projects,
-      });
+      const response = await axios.post(
+        "http://172.22.157.246:8080/api/group/",
+        {
+          name: groupName,
+          members: assignee,
+          projects: projects,
+        }
+      );
       fetchGroupData();
       console.log("Group added successfully", response.data);
     } catch (error) {
@@ -103,7 +106,7 @@ const Groups = () => {
 
   const deleteGroup = async (groupId) => {
     try {
-      await axios.delete(`http://172.20.8.129:8080/api/group/${groupId}/`);
+      await axios.delete(`http://172.22.157.246:8080/api/group/${groupId}/`);
       // Remove the deleted group from the state
       setGroupData(groupData.filter((group) => group.id !== groupId));
     } catch (error) {

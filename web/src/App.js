@@ -11,6 +11,7 @@ import Groups from "../src/components/ContentSidebars/Groups";
 import Tasks from "../src/components/ContentSidebars/Tasks";
 import ProjectContents from "../src/components/ContentSidebars/InsideProject/ProjectContents";
 import InsideTask from "./components/ContentSidebars/InsideComponents/InsideTask";
+import Authors from "./components/ContentSidebars/Authors";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             path="/projects/:project_name"
           />
           <PrivateRoute component={InsideTask} path="/task/view_task" />
+          <PrivateRoute component={Authors} path="/authors"/>
         </Switch>
       </AuthProvider>
     </Router>

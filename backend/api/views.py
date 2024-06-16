@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from api.models import User
+from api.models import User, Author
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.mail import send_mail
@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from api.serializers import MyTokenObtainPairSerializer, RegisterSerializer, TaskSerializers, UserSerializer, GroupSerializer, GroupProject_Assoc_Serializers, ProjectTaskSerializer
+from api.serializers import MyTokenObtainPairSerializer, RegisterSerializer, TaskSerializers, UserSerializer, GroupSerializer, GroupProject_Assoc_Serializers, ProjectTaskSerializer, AuthorSerializer
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -127,13 +127,7 @@ class ProjectTaskView(viewsets.ModelViewSet):
         project_name = self.kwargs['project_name']  # Fetch project name from URL kwargs
         project = Project.objects.get(project_name=project_name)  # Fetch project instance
         serializer.save(project_name=project)  # Save task with project instance
-# class ProjectTaskView(generics.ListCreateAPIView):
-#     serializer_class = ProjectTaskSerializer
 
-#     def get_queryset(self):
-#         project_id = self.kwargs['project_id']
-#         return Task.objects.filter(project_name_id=project_id)
-
-#     def perform_create(self, serializer):
-#         project_id = self.kwargs['project_id']
-#         serializer.save(project_name_id=project_id)
+class AuthorView(viewsets.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer

@@ -36,7 +36,7 @@ const Tasks = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch("http://172.20.8.129:8080/api/user/");
+      const response = await fetch("http://172.22.157.246:8080/api/user/");
       if (!response.ok) {
         console.log("Failed to fetch Users");
         throw new Error("Failed to fetch Users");
@@ -50,7 +50,7 @@ const Tasks = () => {
 
   const fetchTaskData = async () => {
     try {
-      const response = await fetch("http://172.20.8.129:8080/api/task/");
+      const response = await fetch("http://172.22.157.246:8080/api/task/");
       if (!response.ok) {
         throw new Error("Failed to fetch Task Data");
       }
@@ -63,13 +63,16 @@ const Tasks = () => {
 
   const postdata = async () => {
     try {
-      const response = await axios.post("http://172.20.8.129:8080/api/task/", {
-        task_name: taskName,
-        assignee: assignee,
-        description: description,
-        start_date: selectedStartDate,
-        due_date: selectedEndDate,
-      });
+      const response = await axios.post(
+        "http://172.22.157.246:8080/api/task/",
+        {
+          task_name: taskName,
+          assignee: assignee,
+          description: description,
+          start_date: selectedStartDate,
+          due_date: selectedEndDate,
+        }
+      );
       console.log("Task added successfully", response.data);
       Toast.show({
         type: ALERT_TYPE.SUCCESS,
@@ -108,7 +111,7 @@ const Tasks = () => {
 
   const deleteTask = async (taskId) => {
     try {
-      await axios.delete(`http://172.20.8.129:8080/api/task/${taskId}/`);
+      await axios.delete(`http://172.22.157.246:8080/api/task/${taskId}/`);
       // Remove the deleted task from the state
       setTaskData(taskData.filter((task) => task.id !== taskId));
       Toast.show({

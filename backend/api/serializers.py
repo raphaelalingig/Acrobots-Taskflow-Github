@@ -1,4 +1,4 @@
-from api.models import User, Project, Group, Task, GroupNprojectAssoc
+from api.models import User, Project, Group, Task, GroupNprojectAssoc, Author
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
@@ -54,10 +54,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
 
-class ProjectSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = ('id','project_name', 'start_date', 'due_date', 'description')
 
 
 class TaskSerializers(serializers.ModelSerializer):
@@ -68,16 +64,30 @@ class TaskSerializers(serializers.ModelSerializer):
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ('id', 'name', 'members', 'projects')
+        fields = ('id', 'name', 'members', 'projects', 'get_member_names')
+
+class ProjectSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Project
+        fields = ('id','project_name', 'start_date', 'due_date', 'description')
+
 
 class GroupProject_Assoc_Serializers(serializers.ModelSerializer):
+    project = ProjectSerializers(many=True)
+
     class Meta:
         model = GroupNprojectAssoc
-        fields = ('id', 'group', 'project', 'project_username', 'members')
+        fields = ('id', 'group', 'project', 'members')
 
 
 class ProjectTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ('id', 'task_name', 'start_date', 'due_date', 'description', 'project_name', 'assignee', 'get_project_name', 'get_user_name')
+
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = "__all__"
 

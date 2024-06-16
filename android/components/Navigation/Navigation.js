@@ -15,6 +15,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { AuthProvider, useAuth } from "../Auth/AuthContext";
 import DropDownPicker from "react-native-dropdown-picker";
 import AuthContext from "../Auth/AuthContext";
+import Authors from "../Pages/Authors";
 
 const BottomTabsNavigator = ({ navigation }) => {
   const { logoutUser } = useContext(AuthContext);
@@ -166,6 +167,10 @@ const BottomTabsNavigator = ({ navigation }) => {
           ),
         })}
       />
+      <Tab.Screen
+      name="Authors"
+      component={Authors}/>
+      
     </Tab.Navigator>
   );
 };

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from api.models import User,Profile, Task, Project, Group, GroupNprojectAssoc
+from api.models import User,Profile, Task, Project, Group, GroupNprojectAssoc, Author
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -23,11 +23,14 @@ class GroupAdmin(admin.ModelAdmin):
 class GroupNprojectAssocAdmin(admin.ModelAdmin):
     list_display = ['group']
 
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register( Profile,ProfileAdmin)
 admin.site.register( Task, TaskAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(GroupNprojectAssoc, GroupNprojectAssocAdmin)
+admin.site.register(Author)
 
 

@@ -48,6 +48,9 @@ class Group(models.Model):
     def get_default_group_id(cls):
         default_group, _ = cls.objects.get_or_create(name="Default Group")
         return default_group.id
+    def get_member_names(self):
+        return [member.username for member in self.members.all()]
+
     
 
 
@@ -57,10 +60,13 @@ class Project(models.Model):
     start_date = models.DateField()
     due_date = models.DateField()
     description = models.TextField()
-    group = models.ManyToManyField(Group)
 
     def __str__(self):
         return self.project_name
+    
+    
+    
+
 
     
 
@@ -93,4 +99,14 @@ class Task(models.Model):
         if self.assignee:
             return self.assignee.username
         return None
+    
+class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100)
+
+    def __str__(self):
+        return self.last_name
+
+
 

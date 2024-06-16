@@ -30,10 +30,13 @@ export const AuthProvider = ({ children }) => {
 
   const loginUser = async (email, password) => {
     try {
-      const response = await axios.post("http://172.20.8.129:8080/api/token/", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://172.22.157.246:8080/api/token/",
+        {
+          email,
+          password,
+        }
+      );
       const data = response.data;
       setAuthTokens(data);
       setUser(jwtDecode(data.access));
@@ -52,7 +55,7 @@ export const AuthProvider = ({ children }) => {
     });
   };
   const registerUser = async (email, username, password, password2) => {
-    const response = await fetch("http://172.20.8.129:8080/api/register/", {
+    const response = await fetch("http://172.22.157.246:8080/api/register/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
